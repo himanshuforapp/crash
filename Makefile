@@ -297,7 +297,7 @@ clean: make_configure
 	@make --no-print-directory do_clean
 
 do_clean:
-	rm -rf ${GDB}
+	rm -rf ${GDB} 
 	rm -f ${OBJECT_FILES} ${DAEMON_OBJECT_FILES} ${PROGRAM} ${PROGRAM}lib.a ${GDB_OFILES}
 	@(cd extensions; make --no-print-directory -i clean)
 	@(cd memory_driver; make --no-print-directory -i clean)
