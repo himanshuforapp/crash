@@ -14,7 +14,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: make ARM64
-      run: make target=ARM64 && ls -l && crash
+      run: make target=ARM64 && ls -l
+           ./crash
     - name: get crash tool ARM64
       uses: actions/upload-artifact@v2
       with:
@@ -23,7 +24,8 @@ jobs:
     - name: clean
       run: make clean
     - name: make X86_64
-      run: make target=X86_64 && ls -l && crash
+      run: make target=X86_64 && ls -l
+           ./crash
     - name: get crash tool X86_64
       uses: actions/upload-artifact@v2
       with:
