@@ -15,3 +15,10 @@ jobs:
     - uses: actions/checkout@v2
     - name: make
       run: make target=ARM64 && ls -l
+    - name: get crash tool
+      uses: actions/upload-artifact@v2
+      with:
+        name: crashtool
+        path: crash
+        
+        
