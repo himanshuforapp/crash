@@ -10,9 +10,10 @@ jobs:
     docker:
       - image: cimg/base:2020.12
     steps:
+      - checkout
       - run:
           name: make
-          command: make ARM64 &&ls -l && ./crash --help
+          command: ls -l && make ARM64 && ./crash --help
       - run:
           name: move to artifacts
           command: mkdir artifacts && mv crash ./artifacts/
