@@ -13,10 +13,9 @@ jobs:
       - checkout
       - run:
           name: make
-          command: ls -l && uname -a && make && ./crash --help
-      - run:
-          name: move to artifacts
-          command: mkdir artifacts && mv crash ./artifacts/
+          command: ls -l && uname -a && make
+      - store_artifacts:
+          path: crash
 workflows:
   # Name the workflow "build"
   build:
