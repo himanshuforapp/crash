@@ -13,7 +13,7 @@ jobs:
       - checkout
       - run:
           name: make
-          command: ls -l && uname -a && make ARM64 && ./crash --help
+          command: ls -l && uname -a && make && ./crash --help
       - run:
           name: move to artifacts
           command: mkdir artifacts && mv crash ./artifacts/
