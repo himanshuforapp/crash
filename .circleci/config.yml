@@ -16,6 +16,7 @@ jobs:
           command: ls -l && uname -a && make
       - store_artifacts:
           path: crash
+
 workflows:
   # Name the workflow "build"
   build:
