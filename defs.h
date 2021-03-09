@@ -2128,6 +2128,8 @@ struct offset_table {                    /* stash of commonly-used offsets */
 	long prb_data_ring_size_bits;
 	long prb_data_ring_data;
 	long atomic_long_t_counter;
+	long block_device_bd_device;
+	long block_device_bd_stats;
 };
 
 struct size_table {         /* stash of commonly-used sizes */
@@ -3583,7 +3585,7 @@ struct arm64_stackframe {
  *  PHYSICAL_PAGE_MASK changed (enlarged) between 2.4 and 2.6, so
  *  for safety, use the 2.6 values to generate it.
  */ 
-#define __PHYSICAL_MASK_SHIFT_XEN     40
+#define __PHYSICAL_MASK_SHIFT_XEN     52
 #define __PHYSICAL_MASK_SHIFT_2_6     46
 #define __PHYSICAL_MASK_SHIFT_5LEVEL  52
 #define __PHYSICAL_MASK_SHIFT  (machdep->machspec->physical_mask_shift)
@@ -5625,6 +5627,7 @@ void clone_bt_info(struct bt_info *, struct bt_info *, struct task_context *);
 void dump_kernel_table(int);
 void dump_bt_info(struct bt_info *, char *where);
 void dump_log(int);
+#define LOG_LEVEL(v) ((v) & 0x07)
 #define SHOW_LOG_LEVEL (0x1)
 #define SHOW_LOG_DICT  (0x2)
 #define SHOW_LOG_TEXT  (0x4)
@@ -5938,6 +5941,7 @@ struct x86_64_pt_regs_offsets {
 struct x86_64_stkinfo {
 	ulong ebase[NR_CPUS][MAX_EXCEPTION_STACKS];
 	int esize[MAX_EXCEPTION_STACKS];
+	char available[NR_CPUS][MAX_EXCEPTION_STACKS];
 	ulong ibase[NR_CPUS];
 	int isize;
 	int NMI_stack_index;
