@@ -4473,6 +4473,7 @@ do_module_cmd(ulong flag, char *modref, ulong address,
 	char buf1[BUFSIZE];
 	char buf2[BUFSIZE];
 	char buf3[BUFSIZE];
+	char buf4[BUFSIZE];
 
 	if (NO_MODULES())
 		return;
@@ -4494,10 +4495,12 @@ do_module_cmd(ulong flag, char *modref, ulong address,
 	        }
 	
 		if (flag == LIST_MODULE_HDR) {
-			fprintf(fp, "%s  %s  %s  OBJECT FILE\n",
+			fprintf(fp, "%s  %s  %s  %s  OBJECT FILE\n",
 				mkstring(buf1, VADDR_PRLEN, CENTER|LJUST, 
 				"MODULE"),
 				mkstring(buf2, maxnamelen, LJUST, "NAME"),
+				mkstring(buf4, VADDR_PRLEN, CENTER|LJUST,
+				"BASE"),
 				mkstring(buf3, maxsizelen, RJUST, "SIZE"));
 		}
 	
@@ -4509,6 +4512,8 @@ do_module_cmd(ulong flag, char *modref, ulong address,
 				    LONG_HEX|RJUST, MKSTR(lm->module_struct)));
 				fprintf(fp, "%s  ", mkstring(buf2, maxnamelen, 
 					LJUST, lm->mod_name));
+				fprintf(fp, "%s  ", mkstring(buf4, VADDR_PRLEN,
+				    LONG_HEX|RJUST, MKSTR(lm->mod_base)));
 				fprintf(fp, "%s  ", mkstring(buf3, maxsizelen,
 					RJUST|LONG_DEC, MKSTR(lm->mod_size)));
 				// fprintf(fp, "%6ld  ", lm->mod_size);
@@ -5256,6 +5261,8 @@ dump_log_entry(char *logptr, int msg_flags)
 		ilen = strlen(buf);
 		fprintf(fp, "%s", buf);
 	}
+
+	level = LOG_LEVEL(level);
 
 	if (msg_flags & SHOW_LOG_LEVEL) {
 		sprintf(buf, "<%x>", level);
@@ -10241,7 +10248,7 @@ static struct ikconfig_list {
 	char *val;
 } *ikconfig_all;
 
-static void add_ikconfig_entry(char *line, struct ikconfig_list *ent)
+static int add_ikconfig_entry(char *line, struct ikconfig_list *ent)
 {
 	char *tokptr, *name, *val;
 
@@ -10249,8 +10256,16 @@ static void add_ikconfig_entry(char *line, struct ikconfig_list *ent)
 	sscanf(name, "CONFIG_%s", name);
 	val = strtok_r(NULL, "", &tokptr);
 
+	if (!val) {
+		if (CRASHDEBUG(2))
+			error(WARNING, "invalid ikconfig entry: %s\n", line);
+		return FALSE;
+	}
+
 	ent->name = strdup(name);
 	ent->val = strdup(val);
+
+	return TRUE;
 }
 
 static int setup_ikconfig(char *config)
@@ -10270,8 +10285,8 @@ static int setup_ikconfig(char *config)
 			ent++;
 
 		if (STRNEQ(ent, "CONFIG_")) {
-			add_ikconfig_entry(ent,
-					 &ikconfig_all[kt->ikconfig_ents++]);
+			if (add_ikconfig_entry(ent, &ikconfig_all[kt->ikconfig_ents]))
+				kt->ikconfig_ents++;
 			if (kt->ikconfig_ents == IKCONFIG_MAX) {
 				error(WARNING, "ikconfig overflow.\n");
 				return 1;
@@ -11152,7 +11167,8 @@ show_kernel_taints_v4_10(char *buf, int verbose)
 	ulong tainted_mask, *tainted_mask_ptr;
 	struct syment *sp;
 
-	if (!VALID_STRUCT(taint_flag)) {
+	if (!(VALID_STRUCT(taint_flag) &&
+	     VALID_MEMBER(tnt_true) && VALID_MEMBER(tnt_false))) {
 		STRUCT_SIZE_INIT(taint_flag, "taint_flag");
 		MEMBER_OFFSET_INIT(tnt_true, "taint_flag", "true");
 		MEMBER_OFFSET_INIT(tnt_false, "taint_flag", "false");

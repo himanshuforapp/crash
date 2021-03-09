@@ -258,8 +258,9 @@ gdb_unzip:
 	@if [ ! -f ${GDB}.tar.gz ] && [ ! -f /usr/bin/wget ]; then \
 	  echo /usr/bin/wget is required to download ${GDB}.tar.gz; echo; exit 1; fi
 	@if [ ! -f ${GDB}.tar.gz ] && [ -f /usr/bin/wget ]; then \
-	  wget http://ftp.gnu.org/gnu/gdb/${GDB}.tar.gz; fi
-	@tar --exclude-from gdb.files -xvzmf ${GDB}.tar.gz
+	  [ ! -t 2 ] && WGET_OPTS="--progress=dot:mega"; \
+	  wget $$WGET_OPTS http://ftp.gnu.org/gnu/gdb/${GDB}.tar.gz; fi
+	@tar --exclude-from gdb.files -xzmf ${GDB}.tar.gz
 	@make --no-print-directory gdb_patch
 
 gdb_patch:
@@ -330,6 +331,10 @@ lzo: make_configure
 
 snappy: make_configure
 	@./configure -x snappy ${CONF_TARGET_FLAG} -w -b
+	@make --no-print-directory gdb_merge
+
+valgrind: make_configure
+	@./configure -x valgrind ${CONF_TARGET_FLAG} -w -b
 	@make --no-print-directory gdb_merge
 
 main.o: ${GENERIC_HFILES} main.c
